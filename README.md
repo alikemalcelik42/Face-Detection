@@ -1,2 +1,2 @@
-# Python-ile-Y-z-Alg-lama
+# Python
 Python'nın opencv kütüphanesini kullanarak yüz algılamak
