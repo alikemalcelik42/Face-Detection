@@ -1,2 +1,2 @@
-# Python
-Python'nın opencv kütüphanesini kullanarak yüz algılamak
+# Python Face Detection
+Face detection using Python's opencv library!
