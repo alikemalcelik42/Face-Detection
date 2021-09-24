@@ -1,4 +1,4 @@
-# Python Face Detection
+# Face Detection
 ## About
 Face detection using OpenCV and Python 3.9.6.
 ## Installation And Running
