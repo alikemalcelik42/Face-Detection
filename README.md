@@ -4,7 +4,7 @@ Face detection using OpenCV and Python 3.9.6.
 ## Installation And Running
 You can install libraries using pip.
 ```
-pip install cv2
+pip install opencv-python
 ```
 
 And you can run program using python.
