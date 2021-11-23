@@ -18,6 +18,7 @@ def Compare(img1, img2):
 
     return len(matches)
 
+
 cap = cv.VideoCapture(0)
 
 while cap.isOpened():
