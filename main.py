@@ -31,8 +31,8 @@ while cap.isOpened():
 
     for face in faces:
         for (x, y, w, h) in faces:
-            faceFrame = frame[y:y+h, x:x+w]
-            cv.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 4)
+            # frame[y:y+h, x:x+w] = cv.blur(frame[y:y+h, x:x+w] , (50, 50)) # blur
+            cv.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 4) # detect
 
     if cv.waitKey(10) & 0xFF == ord('q'):
         break
