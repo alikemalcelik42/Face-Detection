@@ -27,12 +27,10 @@ while cap.isOpened():
     gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
 
     face_lib = cv.CascadeClassifier("haarcascade_frontalface_default.xml")
-    faces = face_lib.detectMultiScale(gray, 1.3, 5)
+    face = face_lib.detectMultiScale(gray, 1.3, 5)
 
-    for face in faces:
-        for (x, y, w, h) in faces:
-            # frame[y:y+h, x:x+w] = cv.blur(frame[y:y+h, x:x+w] , (50, 50)) # blur
-            cv.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 4) # detect
+    for (x, y, w, h) in face:
+        cv.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 4)
 
     if cv.waitKey(10) & 0xFF == ord('q'):
         break
