@@ -1,41 +1,64 @@
-import cv2 as cv
+import cv2
+import numpy
+import face_recognition
+import os
+
+data = {}
+
+def GetData():
+    for folder in os.listdir("imgs"):
+        data[folder] = []
+        for file in os.listdir(f"imgs/{folder}"):
+            img = face_recognition.load_image_file(f"imgs/{folder}/{file}")
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            faceLog = face_recognition.face_locations(img)[0]
+            encode = face_recognition.face_encodings(img)[0]
+
+            data[folder].append({
+                "img": img,
+                "faceLog": faceLog,
+                "encode": encode
+            })
+
+GetData()
 
 
-def Compare(img1, img2):
-    img1Gray = cv.cvtColor(img1, cv.COLOR_BGR2GRAY)
-    img2Gray = cv.cvtColor(img2, cv.COLOR_BGR2GRAY)
+def FindResult(encode):
+    for user in data.keys():
+        userEncodes = []
+        for img in data[user]:
+            userEncodes.append(img["encode"])
+        
+        results =  face_recognition.face_distance([userEncodes], encode)
+        result = numpy.average(results)
 
-    orb = cv.ORB_create(nfeatures=1000)
-    bf = cv.BFMatcher(cv.NORM_HAMMING, crossCheck=True)
-
-    kp1, des1 = orb.detectAndCompute(img1Gray, None)
-    kp2, des2 = orb.detectAndCompute(img2Gray, None)
-
-    matches = bf.match(des1, des2)
-    matches = sorted(matches,key=lambda x:x.distance)
-    
-    ORB_matches =cv.drawMatches(img1, kp1, img2, kp2, matches[:30], None, flags=2)
-
-    return len(matches)
+        if(result < 0.05):
+            return user
+    return "Unknown"
 
 
-cap = cv.VideoCapture(0)
+cap = cv2.VideoCapture(0)
 
 while cap.isOpened():
-    ret, frame = cap.read()
-    frame = cv.flip(frame, 1)
-    gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+    ret, img = cap.read()
+    img = cv2.flip(img, 1)
 
-    face_lib = cv.CascadeClassifier("haarcascade_frontalface_default.xml")
-    face = face_lib.detectMultiScale(gray, 1.3, 5)
+    rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    faceLogs = face_recognition.face_locations(rgb)
+    encodeLogs = face_recognition.face_encodings(rgb)
 
-    for (x, y, w, h) in face:
-        cv.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 4)
+    if(faceLogs != [] and encodeLogs != []):
+        faceLog = faceLogs[0]
+        encodeLog = encodeLogs[0]
+        cv2.rectangle(img, (faceLog[3], faceLog[0]), (faceLog[1], faceLog[2]), (0, 0, 255), 2)
+        result = FindResult(encodeLog)
+        cv2.putText(img, result, (faceLog[3], faceLog[0]), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0))
 
-    if cv.waitKey(10) & 0xFF == ord('q'):
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-    cv.imshow("Video", frame)
+    cv2.imshow("Video", img)
 
 cap.release()
-cv.destroyAllWindows()
+cv2.destroyAllWindows()
