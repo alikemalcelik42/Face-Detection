@@ -29,10 +29,9 @@ def FindResult(encode):
         for img in data[user]:
             userEncodes.append(img["encode"])
         
-        results =  face_recognition.face_distance([userEncodes], encode)
-        result = numpy.average(results)
+        result =  face_recognition.compare_faces(userEncodes, encode)
 
-        if(result < 0.05):
+        if(result.count(True) > result.count(False)):
             return user
     return "Unknown"
 
@@ -47,15 +46,20 @@ while cap.isOpened():
     faceLogs = face_recognition.face_locations(rgb)
     encodeLogs = face_recognition.face_encodings(rgb)
 
-    if(faceLogs != [] and encodeLogs != []):
-        faceLog = faceLogs[0]
-        encodeLog = encodeLogs[0]
-        cv2.rectangle(img, (faceLog[3], faceLog[0]), (faceLog[1], faceLog[2]), (0, 0, 255), 2)
+    i = 0
+
+    while i < len(faceLogs): 
+        faceLog = faceLogs[i]
+        encodeLog = encodeLogs[i]
         result = FindResult(encodeLog)
-        cv2.putText(img, result, (faceLog[3], faceLog[0]), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0))
 
+        cv2.rectangle(img, (faceLog[3], faceLog[0]), (faceLog[1], faceLog[2]), (0, 255, 0), 2)
+        cv2.rectangle(img, (faceLog[3], faceLog[2]+35), (faceLog[1], faceLog[2]), (0, 255, 0), cv2.FILLED)
+        cv2.putText(img, result, (faceLog[3]+6, faceLog[2]+27), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
+        
+        i += 1
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if cv2.waitKey(30) & 0xFF == ord('q'):
         break
 
     cv2.imshow("Video", img)
